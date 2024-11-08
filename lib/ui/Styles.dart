@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class color{
-  static const primaryColor = Color(0xFF007FFF);
-  static const backgroundColor = Color(0xFFE6F4FF);
+  static const primaryColor = Color(0xFF01623B);
+  static const backgroundColor = Color(0xFFF2F2F2);
 }
 
 class BodyText{
@@ -12,6 +12,14 @@ class BodyText{
         fontFamily: 'Poppins Medium',
         fontSize: 32,
         color: Colors.white,
+    );
+  }
+
+  static TextStyle headingBlack(){
+    return TextStyle(
+      fontFamily: 'Poppins Medium',
+      fontSize: 32,
+      color: Colors.black,
     );
   }
 

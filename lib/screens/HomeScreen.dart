@@ -3,7 +3,7 @@ import 'package:service/components/reuseable_card.dart';
 import 'package:service/ui/Styles.dart';
 import 'package:service/ui/appBar.dart';
 
-class Homescreen extends StatelessWidget{
+class HomeScreen extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,7 +64,7 @@ class Homescreen extends StatelessWidget{
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(30)),
                       child: Center(
-                        child: TextFormField(
+                        child: TextField(
                           decoration: InputDecoration(
                             hintText: ("Search your service..."),
                             hintStyle: TextStyle(

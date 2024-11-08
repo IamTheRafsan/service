@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:service/screens/HomeScreen.dart';
+import 'package:service/screens/SearchScreen.dart';
+import 'package:service/screens/SignInScreen.dart';
+import 'package:service/screens/SignUpScreen.dart';
 import 'package:service/ui/Styles.dart';
 
 void main() async{
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.black
       ),
 
-      home: Homescreen(),
+      home: SignInScreen(),
     );
 
   }
