@@ -3,15 +3,18 @@ import '../ui/Styles.dart';
 
 class InputField extends StatelessWidget{
   final String hintText;
+  final ValueChanged<String> inputValue;
 
   InputField({
     required this.hintText,
+    required this.inputValue
 });
 
 
   @override
   Widget build(BuildContext context) {
       return TextField(
+        onChanged: inputValue,
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,

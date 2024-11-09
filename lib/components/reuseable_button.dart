@@ -3,14 +3,16 @@ import 'package:service/ui/Styles.dart';
 
 class Button extends StatelessWidget{
   final String buttonText;
+  final VoidCallback onPress;
 
   Button({
     required this.buttonText,
+    required this.onPress,
 });
   @override
   Widget build(BuildContext context) {
       return ElevatedButton(
-        onPressed: () {  },
+        onPressed: onPress,
         child: Text(buttonText,
         style: TextStyle(
           color: Colors.white,

@@ -4,7 +4,18 @@ import '../components/reuseable_button.dart';
 import '../components/reuseable_textfield.dart';
 import '../ui/Styles.dart';
 
-class SignInScreen extends StatelessWidget{
+class SignInScreen extends StatefulWidget{
+  @override
+  _SignInScreenState createState() => _SignInScreenState();
+
+
+
+}
+class _SignInScreenState extends State<SignInScreen> {
+
+  String userEmail = " ";
+  String userPassword = " ";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,19 +40,33 @@ class SignInScreen extends StatelessWidget{
                   SizedBox(height: 10,),
                   Row(
                       children: [
-                        Expanded(child: InputField(hintText: "E-mail",))
+                        Expanded(child: InputField(
+                          inputValue: (value) {
+                            setState(() {
+                              userEmail = value;
+                            });
+                          },
+                          hintText: "E-mail",))
                       ]
                   ),
                   SizedBox(height: 10,),
                   Row(
                       children: [
-                        Expanded(child: InputField(hintText: "Password",))
+                        Expanded(child: InputField(
+                          inputValue: (value) {
+                            setState(() {
+                              userPassword = value;
+                            });
+                          },
+                          hintText: "Password",))
                       ]
                   ),
                   SizedBox(height: 15,),
                   Row(
                       children: [
-                        Expanded(child: Button(buttonText: "Sign In",))
+                        Expanded(child: Button(
+                          onPress: () {},
+                          buttonText: "Sign In",))
                       ]
                   ),
                 ],
@@ -52,5 +77,4 @@ class SignInScreen extends StatelessWidget{
       ),
     );
   }
-
 }

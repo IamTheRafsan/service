@@ -4,8 +4,11 @@ import 'package:service/screens/SearchScreen.dart';
 import 'package:service/screens/SignInScreen.dart';
 import 'package:service/screens/SignUpScreen.dart';
 import 'package:service/ui/Styles.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -28,7 +31,7 @@ class MyApp extends StatelessWidget {
           scaffoldBackgroundColor: Colors.black
       ),
 
-      home: SignInScreen(),
+      home: SignUpScreen(),
     );
 
   }
