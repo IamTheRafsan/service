@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:service/ui/Styles.dart'; // Assuming you have a color defined here
+import 'package:service/ui/Styles.dart';
 
-class MyAppBar extends StatelessWidget implements PreferredSizeWidget{
+class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
-  MyAppBar({required this.title});
+  const MyAppBar({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: Text(title,
-        style: TextStyle(
-          color: Colors.white
-        ),
+      title: Text(
+        title,
+        style: const TextStyle(color: Colors.white),
       ),
       backgroundColor: color.primaryColor,
     );
   }
 
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
-
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
