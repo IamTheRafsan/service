@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:service/screens/HomeScreen.dart';
+import 'package:service/screens/SplashScreen.dart';
 import '../components/reuseable_button.dart';
 import '../components/reuseable_textfield.dart';
 import '../ui/Styles.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:service/controllers/signIn.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -15,28 +15,6 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   String userEmail = " ";
   String userPassword = " ";
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Future<void> _signIn() async {
-    try {
-      await _auth.signInWithEmailAndPassword(
-          email: userEmail, password: userPassword);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Sign-in Successful."),
-        backgroundColor: Colors.green,
-      ));
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomeScreen(userEmail: userEmail)));
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Sign-up failed: ${e.toString()}"),
-        backgroundColor: Colors.red,
-      ));
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,16 +68,38 @@ class _SignInScreenState extends State<SignInScreen> {
                     ))
                   ]),
                   const SizedBox(
-                    height: 15,
+                    height: 30,
                   ),
                   Row(children: [
                     Expanded(
                         child: Button(
                       onPress: () {
-                        _signIn();
+                        SignIn.singIn(context:context,
+                          userEmail: userEmail,
+                          userPassword: userPassword
+                        );
                       },
                       buttonText: "Sign In",
                     ))
+                  ]),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Text("Or, Create an account",
+                    style: BodyText.bodyText(),
+
+                  ),
+                  const SizedBox(
+                    height: 30,
+                  ),
+                  Row(children: [
+                    Expanded(
+                        child: ButtonWhite(
+                          onPress: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => SplashScreen()));
+                          },
+                          buttonText: "Sign Up",
+                        ))
                   ]),
                 ],
               ),

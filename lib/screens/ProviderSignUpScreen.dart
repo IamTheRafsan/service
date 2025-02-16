@@ -1,12 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:service/components/reuseable_button.dart';
 import 'package:service/components/reuseable_textfield.dart';
-import 'package:service/screens/SignInScreen.dart';
+import 'package:service/controllers/providerSignUp.dart';
 import 'package:service/ui/Styles.dart';
-import 'package:service/controllers/receiverValidation.dart';
-import 'package:service/components/reuseable_dialog.dart';
+import 'package:service/controllers/fetchData.dart';
+import 'package:service/components/reuseable_dropdown.dart';
+
 
 class ProviderSignUpScreen extends StatefulWidget {
   const ProviderSignUpScreen({super.key});
@@ -23,72 +22,69 @@ class _ProviderSignUpScreenState extends State<ProviderSignUpScreen> {
   String userCategory = " ";
   String userDistrict = " ";
   String userPoliceStation = " ";
+  String userPhoneNumber = " ";
   String userGender = " ";
   String userNID = " ";
+  List<String> categoryList = [];
+  List<String> districtList = [];
+  List<String> policeStationList = [];
+  List<String> genderList = ["Male", "Female"];
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> _signUp() async {
+  final providerSignUp ProviderSignUp = providerSignUp();
 
-    //Validation
-    String? nameError = receiverValidation.validateName(userFullName);
-    String? emailError = receiverValidation.validateEmail(userEmail);
-    String? passwordError = receiverValidation.validatePassword(userPassword);
-    String? confirmPasswordError = receiverValidation.validateConfirmPassword(userPassword, userConfirmPassword);
-    bool emailExists = await receiverValidation.isEmailAlreadyUsed(userEmail);
+  @override
+  void initState() {
+    super.initState();
+    _getCategories();
+    fetchDistricts();
+  }
 
-    if (nameError != null) {
-      CustomDialog.show(context, title: "Name Error!", message: nameError);
-      return;
-    }
+  //getting the categories from the database
+  Future<void> _getCategories() async {
+    List<String> categories = await fetchData.fetchCategories();
+    setState(() {
+      categoryList = categories;
+    });
+  }
 
-    else if (emailError != null) {
-      CustomDialog.show(context, title: "Email Error!", message: emailError);
-      return;
-    }
-
-    else if (passwordError != null) {
-      CustomDialog.show(context, title: "Passord Error!", message: passwordError);
-      return;
-    }
-
-    else if (confirmPasswordError != null) {
-      CustomDialog.show(context, title: "Confirm-Password Error!", message: confirmPasswordError);
-      return;
-    }
-
-    else if (emailExists) {
-      CustomDialog.show(context, title: "Email Error!", message: "Email already exits. Try a new email.");
-      return;
-    }
-
+  //getting the districts from the database
+  Future<void> fetchDistricts() async {
     try {
-      UserCredential userCredential =
-      await _auth.createUserWithEmailAndPassword(
-        email: userEmail,
-        password: userPassword,
-      );
+      List<Map<String, List<String>>> locations = await fetchData.fetchLocations();
 
-      await _firestore
-          .collection('receiverDetails')
-          .doc(userCredential.user?.uid)
-          .set({
-        'Name': userFullName,
-        'Email': userEmail,
-        'Password': userPassword
+      List<String> districts = [];
+      for (var location in locations) {
+          districts.addAll(location.keys);
+        }
+      setState(() {
+        districtList = districts;
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Sign-up successful!"),
-        backgroundColor: Colors.green,
-      ));
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => SignInScreen()));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Sign-up failed"),
-        backgroundColor: Colors.red,
-      ));
+      print("Error fetching districts");
+    }
+  }
+
+
+  //Getting the police stations for the selected district
+  Future<void> fetchPoliceStations() async{
+    try {
+      List<Map<String, List<String>>> locations = await fetchData
+          .fetchLocations();
+
+      List<String> policeStations = [];
+      for (var location in locations) {
+        if (location.containsKey(userDistrict)) {
+          policeStations = location[userDistrict] ?? [];
+          break;
+        }
+      }
+      setState(() {
+        policeStationList = policeStations;
+      });
+    }
+    catch (e) {
+      print("Error fetching police stations");
     }
   }
 
@@ -177,15 +173,49 @@ class _ProviderSignUpScreenState extends State<ProviderSignUpScreen> {
                   ),
                   Row(children: [
                     Expanded(
-                        child: InputField(
-                          inputValue: (value) {
+                        child: DropdownInputField(
+                          hintText: "Select a Category",
+                          options: categoryList,
+                          onChanged: (String? newValue) {
                             setState(() {
-                              userCategory = value;
+                              userCategory = newValue!;
                             });
                           },
-                          hintText: "Select Category",
-                          obsecureText: true,
-                        ))
+                        )
+                    )
+                  ]),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(children: [
+                    Expanded(
+                      child: DropdownInputField(
+                        hintText: "Select District",
+                        options: districtList.isNotEmpty ? districtList : ["No Data"],
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            userDistrict = newValue!;
+                            fetchPoliceStations();
+                          });
+                        },
+                      ),
+                    ),
+                  ]),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(children: [
+                    Expanded(
+                      child: DropdownInputField(
+                        hintText: "Select Police Station",
+                        options: policeStationList,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            userPoliceStation = newValue!;
+                          });
+                        },
+                      ),
+                    ),
                   ]),
                   const SizedBox(
                     height: 10,
@@ -195,11 +225,10 @@ class _ProviderSignUpScreenState extends State<ProviderSignUpScreen> {
                         child: InputField(
                           inputValue: (value) {
                             setState(() {
-                              userDistrict = value;
+                              userPhoneNumber = value;
                             });
                           },
-                          hintText: "Select District",
-                          obsecureText: true,
+                          hintText: "Mobile Number",
                         ))
                   ]),
                   const SizedBox(
@@ -207,30 +236,16 @@ class _ProviderSignUpScreenState extends State<ProviderSignUpScreen> {
                   ),
                   Row(children: [
                     Expanded(
-                        child: InputField(
-                          inputValue: (value) {
-                            setState(() {
-                              userPoliceStation = value;
-                            });
-                          },
-                          hintText: "Select Police Station",
-                          obsecureText: true,
-                        ))
-                  ]),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(children: [
-                    Expanded(
-                        child: InputField(
-                          inputValue: (value) {
-                            setState(() {
-                              userGender = value;
-                            });
-                          },
-                          hintText: "Select Gender",
-                          obsecureText: true,
-                        ))
+                      child: DropdownInputField(
+                        hintText: "Select Your Gender",
+                        options: genderList,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            userGender = newValue!;
+                          });
+                        },
+                      ),
+                    ),
                   ]),
                   const SizedBox(
                     height: 10,
@@ -244,7 +259,6 @@ class _ProviderSignUpScreenState extends State<ProviderSignUpScreen> {
                             });
                           },
                           hintText: "NID number",
-                          obsecureText: true,
                         ))
                   ]),
                   const SizedBox(
@@ -254,7 +268,18 @@ class _ProviderSignUpScreenState extends State<ProviderSignUpScreen> {
                     Expanded(
                         child: Button(
                           onPress: () {
-                            _signUp();
+                            providerSignUp.signUp(context: context,
+                                userFullName: userFullName,
+                                userEmail: userEmail,
+                                userPassword: userPassword,
+                                userConfirmPassword: userConfirmPassword,
+                                userCategory: userCategory,
+                                userDistrict: userDistrict,
+                                userPoliceStation: userPoliceStation,
+                                userPhoneNumber: userPhoneNumber,
+                                userGender: userGender,
+                                userNID: userNID
+                            );
                           },
                           buttonText: "Sign Up",
                         ))

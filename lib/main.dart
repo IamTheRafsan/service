@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           primaryColor: color.primaryColor,
           hintColor: color.primaryColor,
           scaffoldBackgroundColor: Colors.black),
-      home: SplashScreen(),
+      home: SignInScreen(),
     );
   }
 }
